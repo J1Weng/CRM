@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 将CustomerDao接口对应方法映射到mybatis中，编写相应的sql语句 -->
+<mapper namespace="com.j1weng.dao.CustomerDao">
+
+	<select id="findManager" resultType="Manager" parameterType="String">
+        SELECT * FROM manager
+        WHERE account = #{account}
+    </select>
+	<select id="findAll" resultType="Customer">
+		select * from customer
+		limit #{offset},#{pageRecord}
+	</select>
+	<select id="findById" parameterType="long" resultType="Customer">
+		select * from customer
+		where id=#{id}
+	</select>
+	<insert id="addCustomer">
+		insert into customer(id,name,gender,phone,email,description)
+		values (null,#{name},#{gender},#{phone},#{email},#{description})
+	</insert>
+	<delete id="deleteCustomer" parameterType="long">
+		delete from customer
+		where id=#{id}
+	</delete>
+	
+	<update id="editCustomer">
+		update customer
+		set name=#{customer.name},
+			phone=#{customer.phone},
+			gender=#{customer.gender},
+			email=#{customer.email},
+			description =#{customer.email}
+			where id =#{id}
+	</update>
+	
+	<select id="countCustomers" resultType="int">
+		select count(*) from customer
+		<include refid="query_customer_where"></include>
+	</select>
+	
+	<select id="queryAll" resultType="Customer">
+		select * from customer
+		<include refid="query_customer_where"></include>
+		limit #{offset},#{pageRecord}
+	</select>
+	
+	<!-- 模糊查询的sql片段 -->
+	<sql id="query_customer_where">
+		where 1=1
+		<!-- 动态sql -->
+		<if test="customer!=null">
+			<if test="customer.name != null and customer.name!=''">
+				and name like "%${customer.name}%"
+			</if>
+			<if test="customer.gender != null and customer.gender != ''">
+                and gender like "%${customer.gender}%"
+            </if>
+            <if test="customer.phone != null and customer.phone != ''">
+                and phone like "%${customer.phone}%"
+            </if>
+            <if test="customer.email != null and customer.email != ''">
+                and email like "%${customer.email}%"
+            </if>
+            <if test="customer.description != null and customer.description != ''">
+                and description like "%${customer.description}%"
+            </if>
+			
+		</if>
+	</sql>
+</mapper>
